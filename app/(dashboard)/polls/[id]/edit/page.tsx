@@ -3,7 +3,12 @@ import { notFound } from 'next/navigation';
 // Import the client component
 import EditPollForm from './EditPollForm';
 
-export default async function EditPollPage({ params }: { params: { id: string } }) {
+// Define the props type for the page
+type PageProps = {
+  params: { id: string };
+};
+
+export default async function EditPollPage({ params }: PageProps) {
   const { poll, error } = await getPollById(params.id);
 
   if (error || !poll) {
