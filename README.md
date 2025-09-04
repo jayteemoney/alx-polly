@@ -94,3 +94,37 @@ npm run dev
 The application will be available at `http://localhost:3000`.
 
 Good luck, engineer! This is your chance to step into the shoes of a security professional and make a real impact on the quality and safety of this application. Happy hunting!
+
+---
+
+## Security Audit Report
+
+This report outlines the findings and remediation steps taken during a comprehensive security audit of the ALX Polly application.
+
+### 1. Insecure Direct Object Reference (IDOR) in Poll Deletion
+
+-   **Vulnerability**: Any authenticated user could delete any poll by knowing its ID, even if they were not the owner.
+-   **Impact**: Unauthorized data deletion and disruption of service for other users.
+-   **File Affected**: `app/lib/actions/poll-actions.ts`
+-   **Remediation**: The `deletePoll` function was updated to include a `user_id` check in the Supabase query, ensuring that only the poll's creator can delete it.
+
+### 2. Cross-Site Scripting (XSS) in Poll Sharing
+
+-   **Vulnerability**: The poll sharing component was vulnerable to XSS attacks, as it directly rendered content from props without sanitization.
+-   **Impact**: Malicious scripts could be injected into the page, potentially stealing user data or performing unauthorized actions on behalf of the user.
+-   **File Affected**: `app/(dashboard)/polls/vulnerable-share.tsx` (renamed to `PollShare.tsx`)
+-   **Remediation**: The component was refactored to sanitize the `pollId` and `title` props. Additionally, QR code functionality was added for secure sharing.
+
+### 3. Insufficient Input Validation and Weak Password Policy
+
+-   **Vulnerability**: The authentication actions lacked server-side input validation and did not enforce a strong password policy.
+-   **Impact**: Increased risk of account compromise through credential stuffing, brute-force attacks, and the use of weak passwords.
+-   **File Affected**: `app/lib/actions/auth-actions.ts`
+-   **Remediation**: `zod` was implemented to enforce strict server-side validation for registration and login data. A stronger password policy requiring a mix of character types and a minimum length was also enforced.
+
+### 4. Improper Access Control in Middleware
+
+-   **Vulnerability**: Authenticated users were not prevented from accessing the `/login` and `/register` pages.
+-   **Impact**: While low-risk, this represented a logic flaw in the application's access control.
+-   **File Affected**: `lib/supabase/middleware.ts`
+-   **Remediation**: The middleware was updated to check the user's authentication status and redirect them to the dashboard if they attempt to access the login or register pages while already logged in.
