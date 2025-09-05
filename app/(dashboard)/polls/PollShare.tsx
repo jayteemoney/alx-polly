@@ -14,21 +14,35 @@ import { Copy, Share2, Twitter, Facebook, Mail, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode.react";
 
+/**
+ * Props for the PollShare component.
+ */
 interface PollShareProps {
   pollId: string;
   pollTitle: string;
 }
 
+/**
+ * A client-side component that provides multiple ways to share a poll.
+ * It generates a shareable link and provides buttons for copying the link,
+ * sharing on social media, and displaying a QR code.
+ * @param {PollShareProps} props - The props for the component, including the poll ID and title.
+ */
 export default function PollShare({ pollId, pollTitle }: PollShareProps) {
+  // State for the shareable URL and QR code visibility
   const [shareUrl, setShareUrl] = useState("");
   const [showQr, setShowQr] = useState(false);
 
+  // Effect to generate the shareable URL once the component mounts
   useEffect(() => {
     const baseUrl = window.location.origin;
     const pollUrl = `${baseUrl}/polls/${pollId}`;
     setShareUrl(pollUrl);
   }, [pollId]);
 
+  /**
+   * Copies the shareable URL to the clipboard and shows a success toast.
+   */
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -38,6 +52,9 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
     }
   };
 
+  /**
+   * Opens a new window to share the poll on Twitter.
+   */
   const shareOnTwitter = () => {
     const text = encodeURIComponent(`Check out this poll: ${pollTitle}`);
     const url = encodeURIComponent(shareUrl);
@@ -47,6 +64,9 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
     );
   };
 
+  /**
+   * Opens a new window to share the poll on Facebook.
+   */
   const shareOnFacebook = () => {
     const url = encodeURIComponent(shareUrl);
     window.open(
@@ -55,6 +75,9 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
     );
   };
 
+  /**
+   * Opens the user's default email client to share the poll.
+   */
   const shareViaEmail = () => {
     const subject = encodeURIComponent(`Poll: ${pollTitle}`);
     const body = encodeURIComponent(
@@ -97,6 +120,7 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
             Share on social media
           </label>
           <div className="flex space-x-2">
+            {/* Social sharing buttons */}
             <Button
               onClick={shareOnTwitter}
               variant="outline"
@@ -124,6 +148,7 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
               <Mail className="h-4 w-4" />
               Email
             </Button>
+            {/* QR Code toggle button */}
             <Button
               onClick={() => setShowQr(!showQr)}
               variant="outline"
@@ -135,6 +160,7 @@ export default function PollShare({ pollId, pollTitle }: PollShareProps) {
             </Button>
           </div>
         </div>
+        {/* Conditionally render the QR code */}
         {showQr && (
           <div className="flex justify-center p-4">
             <QRCode value={shareUrl} size={128} />
